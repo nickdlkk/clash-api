@@ -13,8 +13,25 @@ import (
 	"strings"
 )
 
-var url = "http://127.0.0.1:9090"
+var apiUrl = "http://127.0.0.1:9090"
 var secrete = ""
+
+func SetUrl(url string) {
+	apiUrl = url
+}
+func TestService() bool {
+	return TestServiceByUrl(apiUrl)
+}
+
+func TestServiceByUrl(url string) bool {
+	resp, err := RequestUrl(url, "get", "/", nil, nil)
+	fmt.Println(resp)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	return true
+}
 
 func SetSecrete(sec string) {
 	secrete = sec
@@ -41,8 +58,11 @@ func SetSecreteFromFile(file string) error {
 	secrete = string(content)
 	return nil
 }
-
 func Request(method, route string, headers map[string]string, body io.Reader) (*http.Response, error) {
+	return RequestUrl(apiUrl, method, route, headers, body)
+}
+
+func RequestUrl(url, method, route string, headers map[string]string, body io.Reader) (*http.Response, error) {
 	if !strings.HasPrefix(route, "/") {
 		route = "/" + route
 	}
